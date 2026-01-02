@@ -469,8 +469,14 @@ export default function Dashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+
+
+
        {/* Задачи на утверждении */}
-      <motion.div
+       {user?.is_admin ? 
+       (
+        <>
+       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
@@ -582,6 +588,9 @@ export default function Dashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+      </>
+    ) : ''}
+      
     </div>
   );
 }
