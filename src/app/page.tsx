@@ -1,43 +1,30 @@
 // src/app/page.tsx
-import { createServerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+'use client';
 
-export default async function HomePage() {
-  // 🔥 ПРАВИЛЬНО: без await!
-  const cookieStore = cookies();
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        async getAll() {
-          return (await cookieStore).getAll().map((cookie) => ({
-            name: cookie.name,
-            value: cookie.value,
-          }));
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(async ({ name, value, options }) =>
-              (await cookieStore).set(name, value, options)
-            );
-          } catch {
-            // Игнорируем ошибки
-          }
-        },
-      },
-    }
+export default function HomePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        router.replace('/dashboard');
+      } else {
+        router.replace('/auth/login');
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    </div>
   );
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (session) {
-    return redirect('/dashboard');
-  } else {
-    return redirect('/auth/login');
-  }
 }
