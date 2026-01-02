@@ -331,6 +331,126 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
+      {/* Задачи на утверждении */}
+       {user?.is_admin ? 
+       (
+        <>
+       <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        className="mb-4 mt-10"
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-white">Задачи на утверждении</h2>
+          {!loading && waitingTasks.length > 0 && (
+            <span className="text-sm text-gray-400">
+              {waitingTasks.length} задач
+            </span>
+          )}
+        </div>
+      </motion.div>
+
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div
+            key="skeleton-waiting"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-3 mb-8"
+          >
+            {[1, 2].map((index) => (
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                className="bg-gray-800 border border-gray-700 rounded-lg p-4 animate-pulse"
+              >
+                <div className="flex items-start">
+                  <div className="h-5 w-5 bg-gray-700 rounded mr-3 mt-0.5"></div>
+                  <div className="flex-grow">
+                    <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                    <div className="flex items-center">
+                      <div className="h-3 bg-gray-700 rounded w-1/4 mr-4"></div>
+                      <div className="h-3 bg-gray-700 rounded w-1/5"></div>
+                    </div>
+                  </div>
+                  <div className="h-6 bg-gray-700 rounded w-16"></div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="real-waiting"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-3 mb-8"
+          >
+            {waitingTasks.length > 0 ? (
+              waitingTasks.map((task, index) => (
+                <motion.div
+                  key={task.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                >
+                  <Link href={`/task/${task.id}`} className="block">
+                    <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:bg-gray-700/50 transition-colors duration-200">
+                      <div className="flex items-start">
+                        <div className="h-5 w-5 rounded-full mr-3 mt-0.5 flex items-center justify-center bg-purple-900/30">
+                          <div className="h-2 w-2 rounded-full bg-purple-400"></div>
+                        </div>
+                        <div className="flex-grow">
+                          <h4 className="font-medium text-white mb-1">
+                            {task.title}
+                          </h4>
+                          <div className="flex items-center text-sm text-gray-300">
+                            <span className="mr-4">
+                              {projects.find((p) => p.id === task.project_id)?.name ||
+                                "Без проекта"}
+                            </span>
+                            <span className="text-purple-400">На утверждении</span>
+                          </div>
+                        </div>
+                        <span className="text-sm font-medium text-gray-300 px-2 py-1 bg-gray-700 rounded">
+                          {user?.is_admin ? "Для утверждения" : "Ожидает"}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 text-center">
+                  <p className="text-gray-400">
+                    {user?.is_admin 
+                      ? "Нет задач на утверждении" 
+                      : "У вас нет задач на утверждении"}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {user?.is_admin 
+                      ? "Все задачи утверждены или ожидают доработки" 
+                      : "Все ваши задачи утверждены или ожидают доработки"}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+      </>
+    ) : ''}
+    
+
       {/* Задачи */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -472,124 +592,7 @@ export default function Dashboard() {
 
 
 
-       {/* Задачи на утверждении */}
-       {user?.is_admin ? 
-       (
-        <>
-       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="mb-4 mt-10"
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-white">Задачи на утверждении</h2>
-          {!loading && waitingTasks.length > 0 && (
-            <span className="text-sm text-gray-400">
-              {waitingTasks.length} задач
-            </span>
-          )}
-        </div>
-      </motion.div>
-
-      <AnimatePresence mode="wait">
-        {loading ? (
-          <motion.div
-            key="skeleton-waiting"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="space-y-3 mb-8"
-          >
-            {[1, 2].map((index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                className="bg-gray-800 border border-gray-700 rounded-lg p-4 animate-pulse"
-              >
-                <div className="flex items-start">
-                  <div className="h-5 w-5 bg-gray-700 rounded mr-3 mt-0.5"></div>
-                  <div className="flex-grow">
-                    <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
-                    <div className="flex items-center">
-                      <div className="h-3 bg-gray-700 rounded w-1/4 mr-4"></div>
-                      <div className="h-3 bg-gray-700 rounded w-1/5"></div>
-                    </div>
-                  </div>
-                  <div className="h-6 bg-gray-700 rounded w-16"></div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        ) : (
-          <motion.div
-            key="real-waiting"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-3 mb-8"
-          >
-            {waitingTasks.length > 0 ? (
-              waitingTasks.map((task, index) => (
-                <motion.div
-                  key={task.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05, duration: 0.3 }}
-                >
-                  <Link href={`/task/${task.id}`} className="block">
-                    <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:bg-gray-700/50 transition-colors duration-200">
-                      <div className="flex items-start">
-                        <div className="h-5 w-5 rounded-full mr-3 mt-0.5 flex items-center justify-center bg-purple-900/30">
-                          <div className="h-2 w-2 rounded-full bg-purple-400"></div>
-                        </div>
-                        <div className="flex-grow">
-                          <h4 className="font-medium text-white mb-1">
-                            {task.title}
-                          </h4>
-                          <div className="flex items-center text-sm text-gray-300">
-                            <span className="mr-4">
-                              {projects.find((p) => p.id === task.project_id)?.name ||
-                                "Без проекта"}
-                            </span>
-                            <span className="text-purple-400">На утверждении</span>
-                          </div>
-                        </div>
-                        <span className="text-sm font-medium text-gray-300 px-2 py-1 bg-gray-700 rounded">
-                          {user?.is_admin ? "Для утверждения" : "Ожидает"}
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))
-            ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 text-center">
-                  <p className="text-gray-400">
-                    {user?.is_admin 
-                      ? "Нет задач на утверждении" 
-                      : "У вас нет задач на утверждении"}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {user?.is_admin 
-                      ? "Все задачи утверждены или ожидают доработки" 
-                      : "Все ваши задачи утверждены или ожидают доработки"}
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      </>
-    ) : ''}
+       
       
     </div>
   );
