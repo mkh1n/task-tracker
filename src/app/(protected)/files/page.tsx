@@ -30,40 +30,41 @@ export default function FilesPage() {
   }>({});
 
   useEffect(() => {
-    const loadProjects = async () => {
-      setLoading(true);
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+  const loadProjects = async () => {
+    setLoading(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-      const { data: members } = await supabase
-        .from("project_members")
-        .select("project_id");
+    const { data: members } = await supabase
+      .from("project_members")
+      .select("project_id");
 
-      if (!members?.length) {
-        setLoading(false);
-        setProjects([]);
-        return;
-      }
-
-      const ids = members.map((m) => m.project_id);
-      const { data: projectsData } = await supabase
-        .from("projects")
-        .select("*")
-        .in("id", ids)
-        .order("name");
-
-      setProjects(projectsData || []);
-
-      if (projectsData?.length > 0) {
-        loadProjectData(projectsData[0].id);
-      }
-
+    if (!members?.length) {
       setLoading(false);
-    };
+      setProjects([]);
+      return;
+    }
 
-    loadProjects();
-  }, []);
+    const ids = members.map((m) => m.project_id);
+    const { data: projectsData } = await supabase
+      .from("projects")
+      .select("*")
+      .in("id", ids)
+      .order("name");
+
+    setProjects(projectsData || []);
+
+    // Добавь проверку
+    if (projectsData && projectsData.length > 0) {
+      loadProjectData(projectsData[0].id);
+    }
+
+    setLoading(false);
+  };
+
+  loadProjects();
+}, []);
   const handleFileDeleted = (fileId: string) => {
     setFiles((prev) => prev.filter((f) => f.id !== fileId));
     setSelectedFileTask((prev) => {
